@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volante Mega-Sena</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 480px;
+      width: 100%;
+    }
+
+    h2 {
+      color: #208040;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    /* Campo do Nome */
+    .field-group {
+      margin-bottom: 18px;
+    }
+
+    .field-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    .field-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field-group input:focus {
+      border-color: #208040;
+    }
+
+    /* Contador */
+    .counter {
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #e8f5e9;
+      border-radius: 6px;
+      color: #1b5e20;
+      transition: all 0.2s;
+    }
+
+    /* Grade de 10 colunas para os 60 números */
+    .grid-volante {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
+    }
+
+    .number-btn {
+      aspect-ratio: 1;
+      border: 2px solid #ccc;
+      background-color: white;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .number-btn:hover {
+      border-color: #208040;
+    }
+
+    /* Estilo do número marcado (Verde Mega-Sena) */
+    .number-btn.selected {
+      background-color: #208040;
+      color: white;
+      border-color: #208040;
+    }
+
+    /* Estilo quando atinge o limite de 6 */
+    .number-btn:disabled:not(.selected) {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    button.submit-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #208040;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button.submit-btn:hover:not(:disabled) {
+      background-color: #1b5e20;
+    }
+
+    button.submit-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Mega-Sena</h2>
+    
+    <!-- Campo de Nome -->
+    <div class="field-group">
+      <label for="userName">Seu Nome Completo:</label>
+      <input type="text" id="userName" placeholder="Digite seu nome aqui..." autocomplete="off">
+    </div>
+
+    <!-- Contador de Números -->
+    <div class="counter" id="counterText">
+      Marcados: 0 / 6 (Faltam 6)
+    </div>
+
+    <!-- Grade dos Números (01 a 60) -->
+    <div class="grid-volante" id="gridVolante"></div>
+
+    <!-- Botão Enviar -->
+    <button class="submit-btn" id="submitBtn" disabled>Enviar Aposta</button>
+  </div>
+
+  <script>
+    const TOTAL_REQUERIDO = 6;
+    const selectedNumbers = new Set();
+
+    // URL do seu Google Apps Script (integrado ao Google Sheets)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbylG44AThXo8Uq99b9k--pXhWjCj3wQ9kFp6N-bXJ7N/exec"; 
+
+    const userNameInput = document.getElementById('userName');
+    const grid = document.getElementById('gridVolante');
+    const counterText = document.getElementById('counterText');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Gerar os botões de 01 a 60
+    for (let i = 1; i <= 60; i++) {
+      const numStr = i.toString().padStart(2, '0');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'number-btn';
+      btn.textContent = numStr;
+      btn.dataset.number = numStr;
+
+      btn.addEventListener('click', () => toggleNumber(btn, numStr));
+      grid.appendChild(btn);
+    }
+
+    // Listener para o campo de nome
+    userNameInput.addEventListener('input', updateUI);
+
+    function toggleNumber(btn, numStr) {
+      if (selectedNumbers.has(numStr)) {
+        selectedNumbers.delete(numStr);
+        btn.classList.remove('selected');
+      } else {
+        if (selectedNumbers.size < TOTAL_REQUERIDO) {
+          selectedNumbers.add(numStr);
+          btn.classList.add('selected');
+        }
+      }
+
+      updateUI();
+    }
+
+    function updateUI() {
+      const count = selectedNumbers.size;
+      const remaining = TOTAL_REQUERIDO - count;
+      const nameValue = userNameInput.value.trim();
+
+      // Atualiza o texto do contador
+      if (count === TOTAL_REQUERIDO) {
+        counterText.textContent = "✔ 6 números selecionados!";
+        counterText.style.backgroundColor = "#e8f5e9";
+        counterText.style.color = "#1b5e20";
+      } else {
+        counterText.textContent = `Marcados: ${count} / 6 (Faltam ${remaining})`;
+        counterText.style.backgroundColor = "#fff3e0";
+        counterText.style.color = "#e65100";
+      }
+
+      // Ativa o botão somente com o nome preenchido e exatamente 6 dezenas escolhidas
+      if (count === TOTAL_REQUERIDO && nameValue !== '') {
+        submitBtn.disabled = false;
+      } else {
+        submitBtn.disabled = true;
+      }
+
+      // Bloqueia seleções adicionais ao atingir 6
+      const allButtons = document.querySelectorAll('.number-btn');
+      allButtons.forEach(btn => {
+        if (count >= TOTAL_REQUERIDO && !btn.classList.contains('selected')) {
+          btn.disabled = true;
+        } else {
+          btn.disabled = false;
+        }
+      });
+    }
+
+    // Envio para a planilha do Google
+    submitBtn.addEventListener('click', () => {
+      const name = userNameInput.value.trim();
+      const sortedNumbers = Array.from(selectedNumbers).sort((a, b) => a - b);
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Enviando...";
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: name,
+          numeros: sortedNumbers
+        })
+      })
+      .then(() => {
+        alert(`Aposta de ${name} enviada com sucesso!\nNúmeros: ${sortedNumbers.join(', ')}`);
+        
+        // Reseta o formulário
+        userNameInput.value = "";
+        selectedNumbers.clear();
+        const allButtons = document.querySelectorAll('.number-btn');
+        allButtons.forEach(btn => {
+          btn.classList.remove('selected');
+          btn.disabled = false;
+        });
+        updateUI();
+        submitBtn.textContent = "Enviar Aposta";
+      })
+      .catch(error => {
+        alert("Erro ao enviar a aposta. Tente novamente.");
+        console.error(error);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Enviar Aposta";
+      });
+    });
+  </script>
+
+</body>
+</html>
