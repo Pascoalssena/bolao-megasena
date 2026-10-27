@@ -15,13 +15,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
+      padding: 12px;
       margin: 0;
     }
 
     .card {
       background: white;
-      padding: 24px;
+      padding: 16px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       max-width: 480px;
@@ -32,12 +32,13 @@
       color: #208040;
       text-align: center;
       margin-top: 0;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      font-size: 1.4rem;
     }
 
     /* Campo do Nome */
     .field-group {
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .field-group label {
@@ -45,14 +46,15 @@
       font-weight: bold;
       margin-bottom: 6px;
       color: #333;
+      font-size: 0.95rem;
     }
 
     .field-group input {
       width: 100%;
-      padding: 10px 12px;
+      padding: 10px;
       border: 2px solid #ccc;
       border-radius: 6px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       outline: none;
       transition: border-color 0.2s;
     }
@@ -64,39 +66,45 @@
     /* Contador */
     .counter {
       text-align: center;
-      font-size: 1.05rem;
+      font-size: 0.95rem;
       font-weight: bold;
-      margin-bottom: 15px;
-      padding: 10px;
+      margin-bottom: 14px;
+      padding: 8px;
       background-color: #e8f5e9;
       border-radius: 6px;
       color: #1b5e20;
       transition: all 0.2s;
     }
 
-    /* Grade de 10 colunas para os 60 números */
+    /* Grade de 10 colunas ajustada para celulares */
     .grid-volante {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
-      gap: 6px;
+      gap: 3px;
+      width: 100%;
     }
 
     .number-btn {
+      width: 100%;
       aspect-ratio: 1;
-      border: 2px solid #ccc;
+      padding: 0;
+      border: 1px solid #ccc;
       background-color: white;
       border-radius: 4px;
       font-weight: bold;
-      font-size: 0.9rem;
+      font-size: 0.75rem;
       cursor: pointer;
-      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
     }
 
     .number-btn:hover {
       border-color: #208040;
     }
 
-    /* Estilo do número marcado (Verde Mega-Sena) */
+    /* Estilo do número marcado */
     .number-btn.selected {
       background-color: #208040;
       color: white;
@@ -105,13 +113,13 @@
 
     /* Estilo quando atinge o limite de 6 */
     .number-btn:disabled:not(.selected) {
-      opacity: 0.4;
+      opacity: 0.35;
       cursor: not-allowed;
     }
 
     button.submit-btn {
       width: 100%;
-      margin-top: 20px;
+      margin-top: 16px;
       padding: 12px;
       background-color: #208040;
       color: white;
@@ -130,6 +138,19 @@
     button.submit-btn:disabled {
       background-color: #ccc;
       cursor: not-allowed;
+    }
+
+    /* Ajustes específicos para telas muito pequenas */
+    @media (max-width: 360px) {
+      .card {
+        padding: 10px;
+      }
+      .grid-volante {
+        gap: 2px;
+      }
+      .number-btn {
+        font-size: 0.7rem;
+      }
     }
   </style>
 </head>
